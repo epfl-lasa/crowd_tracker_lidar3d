@@ -54,7 +54,8 @@ class RosbagReader():
 
 
 if __name__=='__main__':
-    bag_dir = "/home/brudermueller/Documents/lidar_tracking"
+    print(os.getcwd())
+    bag_dir = "data"
     input_bag = "3m_1person.bag"
     Reader = RosbagReader(bag_dir, input_bag)
     topicList = Reader.readBagTopicList()
