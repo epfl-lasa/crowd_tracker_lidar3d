@@ -1,0 +1,11 @@
+/camera_front/aligned_depth_to_color/camera_info,
+/camera_front/aligned_depth_to_color/image_raw,
+/camera_front/color/camera_info,
+/camera_front/color/image_raw,
+/camera_front/depth/camera_info,
+/camera_front/depth/color/points,
+/camera_front/depth/image_rect_raw,
+/clock,
+/front_lidar/scan,
+/front_lidar/velodyne_packets,
+/front_lidar/velodyne_points
