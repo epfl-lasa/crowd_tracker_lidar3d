@@ -12,6 +12,10 @@ import rospy
 import os
 import sys
 
+import sensor_msgs.point_cloud2 as pc2
+
+import numpy as np
+
 __author__ = "larabrudermueller"
 __date__ = "2020-04-07"
 __email__ = "lara.brudermuller@epfl.ch"
@@ -35,8 +39,17 @@ class RosbagReader():
         """
         topics = self.readBagTopicList()
         messages = {}
-        # iterate through topic, message, timestamp of published messages in bag 
+        # iterate through topic, message, timestamp of published messages in bag
+        
         for topic, msg, _ in self.bag.read_messages(topics=topics):
+            
+            if type(msg).__name__ == '_sensor_msgs__PointCloud2':
+                points = np.zeros((msg.height*msg.width, 3))
+                for pp, ii in zip(pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z")),
+                                  range(points.shape[0])):
+                    points[ii, :] = [pp[0], pp[1], pp[2]]
+                msg = points
+            
             if topic not in messages:
                 messages[topic] = [msg]
             else:
@@ -59,8 +72,11 @@ class RosbagReader():
 
 if __name__=='__main__':
     print(os.getcwd())
-    bag_dir = "data"
-    input_bag = "3m_1person.bag"
+    bag_dir = os.path.dirname(os.path.abspath(__file__))
+    bag_dir = os.path.join(bag_dir, "../data")
+    # bag_dir = "data"
+    input_bag = "1m_1person.bag"
+    # input_bag = "3m_1person.bag"
     Reader = RosbagReader(bag_dir, input_bag)
     # topicList = Reader.readBagTopicList()
     # print topicList
