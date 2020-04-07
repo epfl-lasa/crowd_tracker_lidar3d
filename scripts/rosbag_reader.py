@@ -107,7 +107,9 @@ class RosbagReader():
         topics = self.readBagTopicList()
         messages = {}
         # iterate through topic, message, timestamp of published messages in bag
-        
+
+        max_it_bag = 1
+        it_bag = 0
         for topic, msg, _ in self.bag.read_messages(topics=topics):
             
             if type(msg).__name__ == '_sensor_msgs__PointCloud2':
@@ -121,6 +123,11 @@ class RosbagReader():
                 messages[topic] = [msg]
             else:
                 messages[topic].append(msg)
+
+            it_bag += 1
+            if it_bag >= max_it_bag:
+                break # stop -- too many topics
+            
         self.bag.close()
         return messages
 
@@ -159,10 +166,14 @@ if __name__=='__main__':
     Reader = RosbagReader(bag_dir, input_bag)
     # topicList = Reader.readBagTopicList()
     # print topicList
-    # messages = Reader.read_bag()
+    messages = Reader.read_bag()
+    
+    print('shape msg', messages['/camera_front/depth/color/points'][0].shape)
+
+    import pdb; pdb.set_trace() ### BREAKPOINT ###
     # pointcloud = messages['/front_lidar/velodyne_points']
 
-    Reader.extract_lidar_data()
+    # Reader.extract_lidar_data()
     
     # with open("file.txt", "w") as output:
     #     output.write(str(pointcloud))
