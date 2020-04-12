@@ -62,6 +62,8 @@ class RosbagReader():
                         for p in pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z", "intensity", "time")):
                             row += [p[0], p[1], p[2], p[3], p[4]]
                             filewriter.writerow(row)
+                            row = [str(t)]
+
                     else: 
                         msg_fields = msg.fields
                         header = ['rosbagTimestamp']
@@ -71,6 +73,7 @@ class RosbagReader():
                         for p in pc2.read_points(msg, skip_nans=True, field_names=tuple(header)):
                             row += list(p)
                             filewriter.writerow(row)
+                            row = [str(t)]
 
         self.bag.close()
         print("Parsed data. Saved as {}".format(filename))
