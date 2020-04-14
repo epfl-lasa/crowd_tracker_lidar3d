@@ -15,8 +15,7 @@ import string
 
 import sensor_msgs.point_cloud2 as pc2
 from rosbag.bag import Bag
-from helpers import pointcloud2_to_array
-
+from crowd_tracker_lidar3d.helpers import pointcloud2_to_array
 
 __author__ = "larabrudermueller"
 __date__ = "2020-04-07"
@@ -54,7 +53,7 @@ class RosbagReader():
                     # for each instance in time that has data for topicName
                     # parse data from this instance
                     print("current topic: {}".format(topic))
-                    row = [str(t)]
+                    row = [t]
                     # if type(msg).__name__ == '_sensor_msgs__PointCloud2':
                     if topic == '/front_lidar/velodyne_points':
                         header = ["rosbagTimestamp", "x", "y", "z", "intensity", "time"]
@@ -62,7 +61,7 @@ class RosbagReader():
                         for p in pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z", "intensity", "time")):
                             row += [p[0], p[1], p[2], p[3], p[4]]
                             filewriter.writerow(row)
-                            row = [str(t)]
+                            row = [t]
 
                     else: 
                         msg_fields = msg.fields
@@ -73,7 +72,7 @@ class RosbagReader():
                         for p in pc2.read_points(msg, skip_nans=True, field_names=tuple(header)):
                             row += list(p)
                             filewriter.writerow(row)
-                            row = [str(t)]
+                            row = [t]
 
         self.bag.close()
         print("Parsed data. Saved as {}".format(filename))
@@ -142,12 +141,12 @@ if __name__=='__main__':
     bag_dir = os.path.dirname(os.path.abspath(__file__))
     bag_dir = os.path.join(bag_dir, "../data")
     input_bag = "1m_1person.bag"
-    # input_bag = "3m_1person.bag"
     Reader = RosbagReader(bag_dir, input_bag)
     # topicList = Reader.readBagTopicList()
     # print topicList
     
-    topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
+    # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
+    topics = ['/front_lidar/velodyne_points']
     Reader.save_bag_to_csv(topicList=topics)
 
     # messages = Reader.read_bag()
@@ -157,7 +156,4 @@ if __name__=='__main__':
     # import pdb; pdb.set_trace() ### BREAKPOINT ###
     # pointcloud = messages['/front_lidar/velodyne_points']
 
-    # Reader.extract_lidar_data()
-    
-    # with open("file.txt", "w") as output:
-    #     output.write(str(pointcloud))
+

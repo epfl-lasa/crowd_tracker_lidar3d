@@ -5,3 +5,6 @@ code/*
 !.vscode/extensions.json
 *.code-workspace
 /data
+.vscode/
+build/
+*.pyc
