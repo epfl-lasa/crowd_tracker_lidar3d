@@ -48,7 +48,8 @@ class RosbagReader():
             with open(filename, 'w+') as csvfile:
                 print("Parsing data. This may take a while.")
                 filewriter = csv.writer(csvfile, delimiter = ',')
-
+                flag = 1 # use flag to only write header once to csv file
+                
                 for topic, msg, t in self.bag.read_messages(topic_name):	
                     # for each instance in time that has data for topicName
                     # parse data from this instance
@@ -57,7 +58,9 @@ class RosbagReader():
                     # if type(msg).__name__ == '_sensor_msgs__PointCloud2':
                     if topic == '/front_lidar/velodyne_points':
                         header = ["rosbagTimestamp", "x", "y", "z", "intensity", "time"]
-                        filewriter.writerow(header)
+                        if flag:
+                            filewriter.writerow(header)
+                            flag = 0
                         for p in pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z", "intensity", "time")):
                             row += [p[0], p[1], p[2], p[3], p[4]]
                             filewriter.writerow(row)
@@ -65,11 +68,15 @@ class RosbagReader():
 
                     else: 
                         msg_fields = msg.fields
+                        field_names = []
                         header = ['rosbagTimestamp']
                         for f in msg_fields: 
+                            field_names.append(f.name)
                             header.append(f.name)
-                        filewriter.writerow(header)
-                        for p in pc2.read_points(msg, skip_nans=True, field_names=tuple(header)):
+                        if flag: 
+                            filewriter.writerow(header)
+                            flag = 0
+                        for p in pc2.read_points(msg, skip_nans=True, field_names=tuple(field_names)):
                             row += list(p)
                             filewriter.writerow(row)
                             row = [t]
