@@ -9,3 +9,4 @@ code/*
 build/
 *.pyc
 .env
+*/.ipynb_checkpoints/*
