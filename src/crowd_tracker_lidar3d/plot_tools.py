@@ -1,7 +1,8 @@
 import numpy as np
+import os 
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.colorbar
+
 
 def plot_pointcloud3d(data): 
     plt.ion()
@@ -31,7 +32,6 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=
         x_max, x_min = np.max(data.x), np.min(data.x)
         y_max, y_min = np.max(data.y), np.min(data.y)
         z_max, z_min = np.max(data.z), np.min(data.z)
-        intensity_max, intensity_min = np.max(data.intensity), np.min(data.intensity)
         
         axes_limits = [
             [x_min, x_max], # X axis range
@@ -59,3 +59,51 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=
         
         ax.set_title(title, fontsize=18)
         return im 
+
+def show_projections(raw_data, dimensions, savefig=False, filename=None): 
+    """
+    [summary]
+
+    Args:
+        raw_data (pandas DataFrame): the raw data loaded from rosbags to a dataframe
+        dimensions (list): containing the column names (string) of the dataframe 
+                           (namely x,y,z), if 'intensity' is included, points are colored 
+                           according to their intensity value
+        savefig (bool, default=False)
+    """
+    
+    data = raw_data[dimensions]
+    fig, ax3 = plt.subplots(1, 3, figsize=(30, 15)) # plots in 3 columns
+    # f, ax3 = plt.subplots(3, 1, figsize=(12, 25)) if plots in 1 column 
+
+    im1 = draw_point_cloud(data,
+            ax3[0], 
+            'XZ projection (Y = 0)', 
+            axes=['x', 'z'] # X and Z axes
+        )
+
+    im2 = draw_point_cloud(data,
+            ax3[1], 
+            'XY projection (Z = 0)', 
+            axes=['x', 'y'] # X and Y axes
+        )
+
+    im3 = draw_point_cloud(data,
+            ax3[2], 
+            'YZ projection (X = 0)', 
+            axes=['y', 'z'] # Y and Z axes
+        )
+    if len(dimensions) == 4: 
+        fig.colorbar(ax3[2].collections[0], ax=ax3[2])
+
+    fig.suptitle('Projections of LiDAR pointcloud data', fontsize=18)
+    if savefig: 
+        if filename: 
+            plot_dir = os.path.dirname(os.path.abspath(__file__))
+            plot_dir = os.path.join(plot_dir, "../../plots/") + str(filename) + '.pdf'
+            plt.savefig(plot_dir)  
+        else: 
+            print("Did not save figure. Add filename in arguments to be able to save figure.")
+    plt.show()
+
+    os.path.join(os.path.dirname(__file__), '..')

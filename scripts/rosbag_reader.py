@@ -120,16 +120,6 @@ class RosbagReader():
         self.bag.close()
         return messages
 
-    def extract_lidar_data(self): 
-        """
-        extracts lidar data with help of helper functions
-        """
-        # TODO: probably not needed - erase 
-        for topic, msg, _ in self.bag.read_messages(topics='/front_lidar/velodyne_points'):
-            lidar_data = pointcloud2_to_array(msg)
-        print(lidar_data)
-        print(lidar_data.shape)
-
     def readBagTopicList(self):
         """
         Read and save the initial topic list from bag
