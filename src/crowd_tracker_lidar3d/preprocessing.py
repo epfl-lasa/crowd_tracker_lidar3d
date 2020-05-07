@@ -25,7 +25,10 @@ def df_apply_rot(dataframe):
     return df_transformed
 
 
-def filter_ground_points(dataframe,  thresh):
+def return_ground_points(dataframe,  thresh):
     df_filtered = dataframe[dataframe.z <= thresh]
     return df_filtered
 
+def remove_ground_points(dataframe,  thresh):
+    df_filtered = dataframe[dataframe.z > thresh]
+    return df_filtered
