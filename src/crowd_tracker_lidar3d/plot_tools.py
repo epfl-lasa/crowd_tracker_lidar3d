@@ -5,10 +5,13 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot_pointcloud3d(data): 
+    no_points = data.shape[0]
+    point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
+
     plt.ion()
-    fig = plt.figure()
+    fig = plt.figure(figsize=[13,9])
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=50, edgecolor='', marker='o')
+    ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*2, edgecolor='', marker='o')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
@@ -17,12 +20,15 @@ def plot_pointcloud3d(data):
     plt.title('3D Point Cloud data')
     plt.show()
     
-def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=None, zlim3d=None):
+def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=None, zlim3d=None, point_eliminations=None):
         no_points = data.shape[0]
         point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
         
         if data.shape[1] == 4: # If point cloud is XYZI format (I = intensity)
             im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c=data['intensity'], cmap='viridis')
+            if point_eliminations is not None: 
+                ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+
         elif data.shape[1] == 3:   # If point cloud is XYZ format 
             im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c='b', alpha = 0.7)
         
@@ -60,7 +66,7 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=
         ax.set_title(title, fontsize=18)
         return im 
 
-def show_projections(raw_data, dimensions, savefig=False, filename=None): 
+def show_projections(raw_data, dimensions, savefig=False, filename=None, point_eliminations=None): 
     """
     [summary]
 
@@ -73,25 +79,30 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None):
     """
     
     data = raw_data[dimensions]
+    if point_eliminations is not None:
+        point_eliminations = point_eliminations[dimensions]
     fig, ax3 = plt.subplots(1, 3, figsize=(30, 15)) # plots in 3 columns
     # f, ax3 = plt.subplots(3, 1, figsize=(12, 25)) if plots in 1 column 
 
     im1 = draw_point_cloud(data,
             ax3[0], 
             'XZ projection (Y = 0)', 
-            axes=['x', 'z'] # X and Z axes
+            axes=['x', 'z'], # X and Z axes,
+            point_eliminations=point_eliminations
         )
 
     im2 = draw_point_cloud(data,
             ax3[1], 
             'XY projection (Z = 0)', 
-            axes=['x', 'y'] # X and Y axes
+            axes=['x', 'y'], # X and Y axes
+            point_eliminations=point_eliminations
         )
 
     im3 = draw_point_cloud(data,
             ax3[2], 
             'YZ projection (X = 0)', 
-            axes=['y', 'z'] # Y and Z axes
+            axes=['y', 'z'], # Y and Z axes
+            point_eliminations=point_eliminations
         )
     if len(dimensions) == 4: 
         fig.colorbar(ax3[2].collections[0], ax=ax3[2])
@@ -100,7 +111,7 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None):
     if savefig: 
         if filename: 
             plot_dir = os.path.dirname(os.path.abspath(__file__))
-            plot_dir = os.path.join(plot_dir, "../../plots/") + str(filename) + '.pdf'
+            plot_dir = os.path.join(plot_dir, "../../plots/") + str(filename) + '.svg'
             plt.savefig(plot_dir)  
         else: 
             print("Did not save figure. Add filename in arguments to be able to save figure.")
