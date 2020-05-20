@@ -9,6 +9,7 @@ code/*
 build/
 *.pyc
 *.svg
+*.png
 *.pdf
 .env
 */.ipynb_checkpoints/*
