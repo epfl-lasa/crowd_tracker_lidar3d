@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 '''
 Extracts data from rosbags. 
 Rosbags are stored in data folder within package, excluded from git repo.
@@ -80,7 +81,6 @@ class RosbagReader():
                             filewriter.writerow(row)
                             row = [t]
 
-        self.bag.close()
         print("Parsed data. Saved as {}".format(filename))
 
 
@@ -97,7 +97,7 @@ class RosbagReader():
             print("Parsing data. This may take a while.")
             filewriter = csv.writer(csvfile, delimiter = ',')
 
-            header = ['rosbagTimestamp', 'detection_id', 'confidence', 'x', 'y','z', 'height']
+            header = ['rosbagTimestamp', 'detection_id', 'confidence', 'det_x', 'det_y','det_z', 'height']
             filewriter.writerow(header)
 
             for _, msg, t in self.bag.read_messages(topic_name):
@@ -111,7 +111,6 @@ class RosbagReader():
                     row.append(det.height)
                     filewriter.writerow(row)
                     row = [t]
-        self.bag.close()
         print("Parsed data. Saved as {}".format(filename))
 
 
@@ -147,7 +146,6 @@ class RosbagReader():
             if it_bag >= max_it_bag:
                 break # stop -- too many topics
 
-        self.bag.close()
         return messages
 
     def readBagTopicList(self):
@@ -173,9 +171,12 @@ if __name__=='__main__':
     for topic in topicList: 
         print topic     
     # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
-    # topics = ['/front_lidar/velodyne_points'] 
+    
+    topics = ['/front_lidar/velodyne_points'] 
     # Reader.save_bag_to_csv(topicList=topics)
     Reader.save_rwth_detections()
+    
+    Reader.bag.close()
 
     # messages = Reader.read_bag()
     # print('shape msg', messages['/camera_front/depth/color/points'][0].shape)

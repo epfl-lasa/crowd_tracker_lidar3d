@@ -1,5 +1,6 @@
 import numpy as np
 import os 
+from itertools import chain
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -9,9 +10,9 @@ def plot_pointcloud3d(data):
     point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
 
     plt.ion()
-    fig = plt.figure(figsize=[13,9])
+    fig = plt.figure(figsize=[10,8])
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*2, edgecolor='', marker='o')
+    ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*5, edgecolor='', marker='o')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
@@ -20,7 +21,7 @@ def plot_pointcloud3d(data):
     plt.title('3D Point Cloud data')
     plt.show()
     
-def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=None, zlim3d=None, point_eliminations=None):
+def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], axes_limits=None, xlim3d=None, ylim3d=None, zlim3d=None, point_eliminations=None):
         no_points = data.shape[0]
         point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
         
@@ -35,15 +36,16 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], xlim3d=None, ylim3d=
         ax.set_xlabel('{} axis'.format(axes[0]), fontsize=16)
         ax.set_ylabel('{} axis'.format(axes[1]), fontsize=16)
         
-        x_max, x_min = np.max(data.x), np.min(data.x)
-        y_max, y_min = np.max(data.y), np.min(data.y)
-        z_max, z_min = np.max(data.z), np.min(data.z)
-        
-        axes_limits = [
-            [x_min, x_max], # X axis range
-            [y_min, y_max], # Y axis range
-            [z_min, z_max]   # Z axis range
-        ]
+        if not axes_limits:
+            x_max, x_min = np.max(data.x), np.min(data.x)
+            y_max, y_min = np.max(data.y), np.min(data.y)
+            z_max, z_min = np.max(data.z), np.min(data.z)
+            
+            axes_limits = [
+                [x_min, x_max], # X axis range
+                [y_min, y_max], # Y axis range
+                [z_min, z_max]   # Z axis range
+            ]
         
         if len(axes) > 2: # 3-D plot
             ax.set_xlim3d(axes_limits[0])
@@ -81,13 +83,30 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
     data = raw_data[dimensions]
     if point_eliminations is not None:
         point_eliminations = point_eliminations[dimensions]
-    fig, ax3 = plt.subplots(1, 3, figsize=(30, 15)) # plots in 3 columns
+    fig, ax3 = plt.subplots(1, 3, figsize=(20, 10)) # plots in 3 columns
     # f, ax3 = plt.subplots(3, 1, figsize=(12, 25)) if plots in 1 column 
+
+    x_max, x_min = np.max(raw_data.x), np.min(raw_data.x)
+    y_max, y_min = np.max(raw_data.y), np.min(raw_data.y)
+    z_max, z_min = np.max(raw_data.z), np.min(raw_data.z)
+
+    if point_eliminations is not None: 
+        x_max, x_min = np.max(list(data.x) +  list(point_eliminations.x)), np.min(list(data.x) + list(point_eliminations.x))
+        y_max, y_min = np.max(list(data.y) + list(point_eliminations.y)), np.min(list(data.y) + list(point_eliminations.y))
+        z_max, z_min = np.max(list(data.z) + list(point_eliminations.z)), np.min(list(data.z) + list(point_eliminations.z))
+            
+        
+    axes_limits = [
+        [x_min, x_max], # X axis range
+        [y_min, y_max], # Y axis range
+        [z_min, z_max]   # Z axis range
+    ]
 
     im1 = draw_point_cloud(data,
             ax3[0], 
             'XZ projection (Y = 0)', 
             axes=['x', 'z'], # X and Z axes,
+            axes_limits=[axes_limits[0], axes_limits[2]],
             point_eliminations=point_eliminations
         )
 
@@ -95,6 +114,7 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
             ax3[1], 
             'XY projection (Z = 0)', 
             axes=['x', 'y'], # X and Y axes
+            axes_limits=[axes_limits[0], axes_limits[1]],
             point_eliminations=point_eliminations
         )
 
@@ -102,6 +122,7 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
             ax3[2], 
             'YZ projection (X = 0)', 
             axes=['y', 'z'], # Y and Z axes
+            axes_limits=[axes_limits[1], axes_limits[2]],
             point_eliminations=point_eliminations
         )
     if len(dimensions) == 4: 
@@ -111,7 +132,7 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
     if savefig: 
         if filename: 
             plot_dir = os.path.dirname(os.path.abspath(__file__))
-            plot_dir = os.path.join(plot_dir, "../../plots/") + str(filename) + '.svg'
+            plot_dir = os.path.join(plot_dir, "../../plots/") + str(filename) + '.png'
             plt.savefig(plot_dir)  
         else: 
             print("Did not save figure. Add filename in arguments to be able to save figure.")
