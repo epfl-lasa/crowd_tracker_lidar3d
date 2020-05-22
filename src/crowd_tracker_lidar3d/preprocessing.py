@@ -38,3 +38,12 @@ def return_ground_points(dataframe,  thresh):
 def remove_ground_points(dataframe,  thresh):
     df_filtered = dataframe[dataframe.z > thresh]
     return df_filtered
+
+def standardize_data(df):
+    normalized_df = df.copy()
+    std_tot = np.sum([df.x.std(), df.y.std(), df.z.std()])
+    for dim in ['x','y','z']:
+        avg = df[dim].mean()
+        normalized_df[dim] = (df[dim] - avg)/std_tot
+    normalized_df['intensity'] =(df.intensity - df.intensity.mean()) / df.intensity.std()
+    return normalized_df 
