@@ -1,17 +1,22 @@
 import numpy as np
 import os 
+import pandas as pd
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def plot_pointcloud3d(data): 
-    no_points = data.shape[0]
-    point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
+def plot_pointcloud3d(data, point_size=None): 
+    if not point_size: 
+        no_points = data.shape[0]
+        point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
 
     plt.ion()
     fig = plt.figure(figsize=[10,8])
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*5, edgecolor='', marker='o')
+    if isinstance(data, pd.DataFrame):
+        ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*5, edgecolor='', marker='o')
+    else: 
+        ax.scatter(data[:,0], data[:,1], data[:,2], c=data[:,3], s=point_size*5, edgecolor='', marker='o')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
