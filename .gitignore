@@ -4,3 +4,13 @@ code/*
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+/data
+.vscode/
+build/
+*.pyc
+*.svg
+*.png
+*.pdf
+.env
+*/.ipynb_checkpoints/*
+
