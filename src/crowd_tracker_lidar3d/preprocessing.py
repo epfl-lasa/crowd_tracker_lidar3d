@@ -5,27 +5,28 @@ from scipy.spatial.transform import Rotation as R
 def rotate_pcl(data, quat=None): 
     if not quat: 
         # quat = [0, 0.0261769, 0, 0.9996573] # obtained from sensor calibration 
-        quat =  [0, -0.0261769, 0, 0.9996573]
-    # r = R.from_quat(quat)
-    # rot_mat = r.as_dcm() # represent rotation as direct cosine matrices (3x3 real orth. mat. with determinant=1)
+        # quat =  [0, -0.0261769, 0, 0.9996573]
+        rot_mat = np.array([[  0.9961947,  0.0000000,  0.0871557],
+                            [0.0000000,  1.0000000,  0.0000000],
+                            [-0.0871557,  0.0000000,  0.9961947 ]])
+    else: 
+        r = R.from_quat(quat)
+        rot_mat = r.as_dcm() # represent rotation as direct cosine matrices (3x3 real orth. mat. with determinant=1)
 
-    # R = np.array([ [0.9975641,  0.0000000,  0.0697565],
-    #        [0.0000000,  1.0000000,  0.0000000],
-    #       [-0.0697565,  0.0000000,  0.9975641 ]])
-
-    R = np.array([[  0.9961947,  0.0000000,  0.0871557],
-                [0.0000000,  1.0000000,  0.0000000],
-                [-0.0871557,  0.0000000,  0.9961947 ]])
-
-    # print(rot_mat)
-    data_array = data[['x','y','z']].to_numpy()
-    data_rotated = np.dot(data_array, R.T)
-
+    data_array = data[['x', 'y', 'z']].to_numpy()
+    data_rotated = np.dot(data_array, rot_mat.T)
     return data_rotated
 
+def translate_height(data, z):
+    assert data.shape[0] >= data.shape[1] # assert that columns represent features in matrix/dataframe
+    if isinstance(data, pd.DataFrame):
+        data = data.add(z, axis='z')
+    else: 
+        data[:,3] + z
+    return data
 
-def df_apply_rot(dataframe): 
-    transformed_arr = rotate_pcl(dataframe)
+def df_apply_rot(dataframe, quat=None): 
+    transformed_arr = rotate_pcl(dataframe, quat)
     df_transformed = pd.DataFrame(transformed_arr, columns=['x', 'y', 'z'])
     df_transformed['intensity'] = dataframe['intensity']
     return df_transformed
