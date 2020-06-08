@@ -25,10 +25,16 @@ def translate_height(data, z):
         data[:,3] + z
     return data
 
-def df_apply_rot(dataframe, quat=None): 
+def df_apply_rot(dataframe, quat=None, return_full_df=False): 
     transformed_arr = rotate_pcl(dataframe, quat)
     df_transformed = pd.DataFrame(transformed_arr, columns=['x', 'y', 'z'])
-    df_transformed['intensity'] = dataframe['intensity']
+    if return_full_df: 
+        dataframe['x'] = df_transformed['x']
+        dataframe['y'] = df_transformed['y']
+        dataframe['z'] = df_transformed['z']
+        df_transformed = dataframe
+    else: 
+        df_transformed['intensity'] = dataframe['intensity']
     return df_transformed
 
 
