@@ -37,7 +37,8 @@ def plot_3d_cluster_results(cluster_data, cluster_model):
     ax = fig.add_subplot(111, projection='3d')
     labels = cluster_model.labels_
     unique_labels = set(labels)
-    colors = [plt.cm.hsv(each)  for each in np.linspace(0, 1, len(unique_labels))]
+    # colors = [plt.cm.hsv(each)  for each in np.linspace(0, 1, len(unique_labels))]
+    colors = ['r','b']
 #     colors = [plt.cm.Spectral(each)  for each in np.linspace(0, 1, len(unique_labels))]
 
     core_samples_mask = None 
@@ -105,8 +106,8 @@ def plot_xy_cluster_results(cluster_data, cluster_model):
 
         
     n_clusters_, _ = return_cluster_and_noise_points(cluster_model)
-    plt.ylim((-1,1))
-    plt.xlim((-2,3))
+    # plt.ylim((-1,1))
+    # plt.xlim((-2,3))
     plt.title('Estimated number of clusters: %d' % n_clusters_, fontsize=18)
     plt.tick_params(labelsize=14)
     plt.ylabel('Y', fontsize=16)

@@ -37,13 +37,17 @@ def df_apply_rot(dataframe, quat=None, return_full_df=False):
         df_transformed['intensity'] = dataframe['intensity']
     return df_transformed
 
+def add_polar_coord(dataframe): 
+    dataframe['r'] = dataframe.apply(lambda row: np.hypot(row.x, row.y), axis=1) 
+    dataframe['phi'] = dataframe.apply(lambda row: np.arctan2(row.y, row.x), axis=1)
+    return dataframe
 
 def return_ground_points(dataframe,  thresh):
     df_filtered = dataframe[dataframe.z <= thresh]
     return df_filtered
 
 def remove_ground_points(dataframe,  thresh):
-    df_filtered = dataframe[dataframe.z > thresh]
+    df_filtered = dataframe[dataframe.z >= thresh].reset_index(drop=True)
     return df_filtered
 
 def standardize_data(df):
