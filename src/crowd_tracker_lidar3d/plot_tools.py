@@ -35,8 +35,10 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], axes_limits=None, xl
                 ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
 
         elif data.shape[1] == 3:   # If point cloud is XYZ format 
-            im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c='b', alpha = 0.7)
-        
+            im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c='b', alpha = 0.3)
+            if point_eliminations is not None: 
+                ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+
         ax.set_xlabel('{} axis'.format(axes[0]), fontsize=16)
         ax.set_ylabel('{} axis'.format(axes[1]), fontsize=16)
         
