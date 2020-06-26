@@ -181,13 +181,13 @@ if __name__=='__main__':
     for input_bag in bag_files_list: 
         print(input_bag)
         Reader = RosbagReader(bag_dir, input_bag, save_dir)
-        # topicList = Reader.readBagTopicList()
-        # for topic in topicList: 
-        #     print topic     
+        topicList = Reader.readBagTopicList()
+        for topic in topicList: 
+            print topic     
         # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
     
-        topics = ['/front_lidar/velodyne_points'] 
-        Reader.save_bag_to_csv(topicList=topics)
+        # topics = ['/front_lidar/velodyne_points'] 
+        # Reader.save_bag_to_csv(topicList=topics)
         # Reader.save_rwth_detections()
     
         Reader.bag.close()

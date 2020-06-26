@@ -11,6 +11,7 @@ catkin_package()
 
 install(PROGRAMS
    scripts/rosbag_reader.py
+   script/file_annotator.py
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
