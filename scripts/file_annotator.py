@@ -28,12 +28,12 @@ def main():
     print(DATA_DIR)
     file_names = get_data_filenames()
     static_files = [f for f in sorted(file_names) if f.startswith('person')]
+    print("{} files to annotate\n".format(len(static_files)))
     print(static_files)
-    i = 0
-    for f in static_files: 
-        if i == 1: 
-            break
-        print("Processing file: {}\n".format(f))
+    i = 0 
+    for f in static_files:
+        i += 1
+        print("\n-------------------------\n {}\{} -  Processing file: {}\n".format(i, len(static_files), f))
         full_file = f + '-front_lidar-velodyne_points'
         data = load_data_to_dataframe(full_file, DATA_DIR)
         dist = float(f.rsplit('_')[1])
@@ -50,8 +50,7 @@ def main():
         
         # Save annotated data 
         data.to_csv(DATA_DIR + '/annotated/' + f + '_annotated.csv', index = False)
-        i +=1
-
+       
 if __name__=='__main__':
     # print(os.listdir(DATA_DIR))
     main()

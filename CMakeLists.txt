@@ -7,11 +7,12 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+# catkin_python_setup()
 catkin_package()
 
 install(PROGRAMS
    scripts/rosbag_reader.py
-   script/file_annotator.py
+   scripts/file_annotator.py
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
