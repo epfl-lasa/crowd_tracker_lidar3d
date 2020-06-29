@@ -10,8 +10,8 @@ Helper functions to write .h5 data files for pointnet, etc.
 
 '''
 
-def save_h5(h5_filename, data, label, data_dtype='uint8', label_dtype='uint8'):
-    h5_fout = h5py.File(h5_filename)
+def save_h5(h5_filename, data, label, data_dtype='float32', label_dtype='int'):
+    h5_fout = h5py.File(h5_filename, 'w')
     h5_fout.create_dataset(
             'data', data=data,
             compression='gzip', compression_opts=4,
@@ -25,7 +25,7 @@ def save_h5(h5_filename, data, label, data_dtype='uint8', label_dtype='uint8'):
     h5_fout.close()
 
 def load_h5(h5_filename):
-    f = h5py.File(h5_filename)
+    f = h5py.File(h5_filename, 'r')
     # f.keys() should be [u'data', u'label']
     data = f['data'][:]
     label = f['label'][:]

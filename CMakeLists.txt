@@ -11,6 +11,7 @@ catkin_package()
 
 install(PROGRAMS
    scripts/rosbag_reader.py
+   scripts/data_to_hdf5.py
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
