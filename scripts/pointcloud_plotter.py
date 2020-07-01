@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
-Extracts data from rosbags. 
-Rosbags are stored in data folder within package, excluded from git repo.
+    Extracts data from rosbags. 
+    Rosbags are stored in data folder within package, excluded from git repo.
 '''
 import os
 import pptk

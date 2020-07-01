@@ -5,9 +5,7 @@ import scipy.io as sio
 import h5py
 
 '''
-
-Helper functions to write .h5 data files for pointnet, etc.
-
+    Helper functions to write .h5 data files for pointnet, etc.
 '''
 
 def save_h5(h5_filename, data, label, data_dtype='float32', label_dtype='int'):
@@ -23,6 +21,7 @@ def save_h5(h5_filename, data, label, data_dtype='float32', label_dtype='int'):
             dtype=label_dtype,
     )
     h5_fout.close()
+    
 
 def load_h5(h5_filename):
     f = h5py.File(h5_filename, 'r')
@@ -30,6 +29,16 @@ def load_h5(h5_filename):
     data = f['data'][:]
     label = f['label'][:]
     return (data,label)
+
+
+def get_data_files(path): 
+    data_files = []                                    
+    for root, dirs, files in os.walk(path):
+         for file in files:
+             if file.endswith('.h5'):
+                data_files.append(file) 
+    return data_files
+
 
 if __name__ == "__main__":
     # =============================================================================
