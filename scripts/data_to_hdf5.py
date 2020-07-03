@@ -31,11 +31,11 @@ def main():
     print(file_names)
     for idx, f in enumerate(file_names):
         print('Processing file {}/{}: {}'.format(idx,len(file_names),f))
-	full_file = f + '_annotated'
+	    full_file = f + '_annotated'
     	data = load_data_to_dataframe(full_file, DATA_DIR)
         
     	# Rotate & Translate 
-	data_trans = df_apply_rot(data, QUAT, return_full_df=True)
+	        data_trans = df_apply_rot(data, QUAT, return_full_df=True)
         data_trans = data_trans.add(Z_TRANS, axis='z')
         
         # Save data per timeframe
