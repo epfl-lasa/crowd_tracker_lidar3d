@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+'''
+    Adds approximate minimum 3D bounding box to data labels. Encoded with 6 DOF, 
+    i.e. position of box centroid (x,y,z) as well as box dimensions (h,w,l) and 
+    heading angle (ry) measured around y axis.
+'''
+
+import numpy as np
+import os
+import pandas as pd
+import string
+
+from crowd_tracker_lidar3d.loader import load_data_to_dataframe
+from crowd_tracker_lidar3d.preprocessing import df_apply_rot, remove_ground_points, add_polar_coord
+from crowd_tracker_lidar3d.hdf5_util import save_h5, load_h5
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med/hdf5/")
+SAVE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med/annotated_boundbox/")
+
+    
+def main(): 
+    print(DATA_DIR)
+    # iterate over folders, each containing a data recording scene
+    for folder in sorted(os.listdir(DATA_DIR)):
+        path = os.path.join(DATA_DIR, folder) 
+        data_files = [str(f) for f in sorted(os.listdir(path)) if f.endswith('.h5')] 
+
+        # iterate over labeled point cloud frames saved in hdf5 files 
+        for idx, f in enumerate(data_files): 
+            print('Processing file {}/{}: {}'.format(idx,len(data_files),f))
+            full_file = os.path.join(path, f)
+            data, label = load_h5(full_file) 
+            
+            #TODO: filter data for only positive labels and do bbox calculations only on mask
+
+            # calculate centroid from pointcloud only using spatial coordinates
+            centroid = data[:,:3].mean(axis=0)
+
+            min_x, min_y, min_z = np.min(data[:,0]), np.min(data[:,1]), np.min(data[:,2])
+            max_x, max_y, max_z = np.max(data[:,0]), np.max(data[:,1]), np.max(data[:,2])
+
+            # create bounding box parameters (h,w,l)
+            h = max_z - (max(min_z, 0)) # minimum z might be negative 
+            w = max_x - min_x
+            l = max_y - min_y
+
+            bbox = np.concatenate((centroid, (h,w,l)))
+
+            # Save data per timeframe
+            out_dir = os.path.join(SAVE_DIR, folder, f) #save files in separate directory
+            if os.path.exists(out_dir):
+                continue # File has already been processed
+            
+            os.makedirs(out_dir)
+            save_h5(out_dir, data_final, label)
+
+if __name__=='__main__':
+    main()
