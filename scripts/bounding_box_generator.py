@@ -61,7 +61,7 @@ def main():
             l = max_y - min_y
 
             bbox = np.concatenate((centroid, (h,w,l)))
-            save_h5(os.path.join(out_dir,f), data, bbox)
+            save_h5(os.path.join(out_dir,f), data, bbox, label_dtype='float32')
         print("{}/{} frames empty.".format(empy_frames, len(data_files)))
 
 if __name__=='__main__':
