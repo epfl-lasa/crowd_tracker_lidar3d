@@ -8,7 +8,8 @@ d = generate_distutils_setup(
     packages=['crowd_tracker_lidar3d'],
     package_dir={'': 'src'},
     scripts=['scripts/rosbag_reader', 
-             'scripts/file_annotator']
+             'scripts/file_annotator',
+             'scripts/bounding_box_generator']
 )
 
 setup(**d)

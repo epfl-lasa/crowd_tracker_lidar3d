@@ -13,6 +13,7 @@ catkin_package()
 install(PROGRAMS
    scripts/rosbag_reader.py
    scripts/file_annotator.py
+   scripts/bounding_box_generator.py
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
