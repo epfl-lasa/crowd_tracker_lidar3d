@@ -39,10 +39,15 @@ def main():
             # print('Processing file {}/{}: {}'.format(idx,len(data_files),f))
             full_file = os.path.join(path, f)
             data, label = load_h5(full_file) 
-            
-            #filter data for only positive labels and do bbox calculations only on mask
+
+            # remove floor points from data 
+            ground_mask = np.where(data[:,2] >= 0)
+            final_data = data[ground_mask]
+            label = label[ground_mask]
+
+            # filter data for only positive labels and do bbox calculations only on mask
             mask = np.where(label) 
-            filter_data = data[mask]
+            filter_data = final_data[mask]
 
             # Check if frame contains human/annotations
             if filter_data.shape[0] == 0: 
@@ -56,12 +61,13 @@ def main():
             max_x, max_y, max_z = np.max(filter_data[:,0]), np.max(filter_data[:,1]), np.max(filter_data[:,2])
 
             # create bounding box parameters (h,w,l)
-            h = max_z - (max(min_z, 0)) # minimum z might be negative 
+            h = max_z - min_z 
             w = max_x - min_x
             l = max_y - min_y
 
             bbox = np.concatenate((centroid, (h,w,l)))
-            save_h5(os.path.join(out_dir,f), data, bbox, label_dtype='float32')
+            save_h5(os.path.join(out_dir,f), final_data, bbox, label_dtype='float32')
+
         print("{}/{} frames empty.".format(empy_frames, len(data_files)))
 
 if __name__=='__main__':
