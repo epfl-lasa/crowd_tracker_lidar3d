@@ -9,7 +9,6 @@ import numpy as np
 from sklearn import metrics
 from sklearn.metrics import pairwise_distances
 from IPython.display import clear_output, Image, display
-from sklearn.datasets.samples_generator import make_blobs
 import itertools
 from scipy.spatial.distance import cdist
 from sklearn.mixture import GaussianMixture

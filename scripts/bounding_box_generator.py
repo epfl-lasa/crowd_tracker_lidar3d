@@ -61,9 +61,15 @@ def main():
             max_x, max_y, max_z = np.max(filter_data[:,0]), np.max(filter_data[:,1]), np.max(filter_data[:,2])
 
             # create bounding box parameters (h,w,l)
-            h = max_z - min_z 
+            h = max_z - 0 # assume that legs always on ground  
             w = max_x - min_x
             l = max_y - min_y
+
+            # enlarge bbox by a small constant 
+            const = 0.1
+            h = h + const 
+            w = w + const 
+            l = l + const 
 
             bbox = np.concatenate((centroid, (h,w,l)))
             save_h5(os.path.join(out_dir,f), final_data, bbox, label_dtype='float32')
