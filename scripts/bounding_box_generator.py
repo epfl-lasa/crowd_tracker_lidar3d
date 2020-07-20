@@ -40,7 +40,7 @@ def calc_heading_angle(data, label_mask):
     scaler = StandardScaler()
     # Standardizing the features
     X = StandardScaler().fit_transform(data[:,0:2])
-    # tenplate data for human 
+    # template data for human 
     X_temp = X[label_mask]
 
     # Apply PCA 
@@ -57,7 +57,7 @@ def calc_heading_angle(data, label_mask):
     pca_stats = {
         'explained_variance': pca.explained_variance_ratio_, # percentage of variance explained by each of the selected components
         'eigenvalue': pca.explained_variance_, # largest eigenvalue of covariance matrix of data 
-        'components': pca.components_, # principal axes in feature space, representing the directions of maximum variance in the data
+        'components': pca.components_, # principal axis in feature space, representing the directions of maximum variance in the data
         'mean': pca.mean_ # mean of the data used in PCA
     }
 
@@ -119,7 +119,8 @@ def main():
 
             # Compute orientation 
             orient_angle, pca = calc_heading_angle(final_data, label)
-            pca_stats = [pca['mean'], pca['components']]
+            # pca_stats = [pca['mean'], pca['components']]
+
             bbox = np.concatenate((centroid, (h,w,l), ([orient_angle])))
             save_h5(os.path.join(out_dir,f), final_data, label, bbox=bbox)
 
