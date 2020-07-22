@@ -36,12 +36,11 @@ def calc_heading_angle(data, label_mask):
         orient_angle: the bounding box orientation in radians [-pi,pi]
         pca_stats: a dict with the pca results for plotting the principal component
     """
-    
     scaler = StandardScaler()
-    # Standardizing the features
-    X = StandardScaler().fit_transform(data[:,0:2])
     # template data for human 
-    X_temp = X[label_mask]
+    template = data[label_mask]
+    # Standardize the features of human template 
+    X_temp = StandardScaler().fit_transform(template[:,0:2])
 
     # Apply PCA 
     pca = PCA(n_components=1)
