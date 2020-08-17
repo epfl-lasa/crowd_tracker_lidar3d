@@ -19,7 +19,7 @@ Visual validation of boudning box annotations for each frame via several plottin
 '''
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med/annotated_boundbox/")
-WALK = False 
+WALK = True 
 
 def save_fig(fig, path, extension='.pdf'):
     """ Helper Function to save plots 
@@ -197,6 +197,7 @@ def display_bboxes_in_data(dataset, label, gt_boxes3d, axes_limits, plot=True, a
     return f
 
 def main(): 
+    SAVE_DIR = os.path.join(DATA_DIR, 'plots')
     for folder in sorted(os.listdir(DATA_DIR)):
         if WALK: 
             start = 'walk'
@@ -211,14 +212,13 @@ def main():
             dist = int(folder.split('_')[-1])
             
             # create subdirectory to save plots 
-            SAVE_DIR = os.path.join(path, 'plots')
-            if os.path.exists(SAVE_DIR):
-                shutil.rmtree(SAVE_DIR)
-                os.makedirs(SAVE_DIR)
+            save_dir_temp = os.path.join(SAVE_DIR, folder)
+            if os.path.exists(save_dir_temp):
+                shutil.rmtree(save_dir_temp)
             #     pass # File has already been processed
-            else:
-                os.makedirs(SAVE_DIR)
-                
+
+            os.makedirs(save_dir_temp)
+                           
             # downsample frames 
             # frame_sample = data_files[::20]
             frame_sample = sorted(data_files)[20:40]
@@ -253,7 +253,7 @@ def main():
                 
                 detections_proj = display_bboxes_in_data(data, label, gt_box, axes_limits, angle=True, bbox=bbox, plot=False)
                 frame_name = str.rstrip(frame, '.h5')
-                save_fig(detections_proj, os.path.join(SAVE_DIR, frame_name), extension='.pdf')
+                save_fig(detections_proj, os.path.join(save_dir_temp, frame_name), extension='.pdf')
                 plt.close('all')
             # break
 

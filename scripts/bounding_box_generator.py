@@ -10,6 +10,7 @@ import math
 import os
 import pandas as pd
 import string
+import shutil
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -35,7 +36,8 @@ def main():
         # Save data per timeframe
         out_dir = os.path.join(SAVE_DIR, folder) #save files in separate directory
         if os.path.exists(out_dir):
-            continue # File has already been processed
+            shutil.rmtree(SAVE_DIR)
+            # continue # File has already been processed
         os.makedirs(out_dir)
         print("Processing {} frames".format(len(data_files)))
         
@@ -47,9 +49,12 @@ def main():
             data, label = load_h5(full_file) 
 
             # remove floor points from data 
-            ground_mask = np.where(data[:,2] >= 0)
-            final_data = data[ground_mask]
-            label = label[ground_mask]
+
+            # ground_mask = np.where(data[:,2] >= 0)
+            # final_data = data[ground_mask]
+            final_data = data
+            print('Number of points: {}'.format(data.shape[0]))
+            # label = label[ground_mask]
 
             # filter data for only positive labels and do bbox calculations only on mask
             mask = np.where(label) 
