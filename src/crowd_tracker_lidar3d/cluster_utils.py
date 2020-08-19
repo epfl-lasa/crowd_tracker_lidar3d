@@ -4,7 +4,7 @@ import seaborn as sns
 from collections import Counter
 import pickle
 import random
-from tqdm import tqdm
+# from tqdm import tqdm
 import numpy as np
 from sklearn import metrics
 from sklearn.metrics import pairwise_distances
