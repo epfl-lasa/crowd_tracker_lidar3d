@@ -7,15 +7,22 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
-# catkin_python_setup()
+catkin_python_setup()
 catkin_package()
 
-install(PROGRAMS
-   scripts/rosbag_reader.py
-   scripts/file_annotator.py
-   scripts/bounding_box_generator.py
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(PROGRAMS
+#   scripts/rosbag_reader.py
+#   scripts/file_annotator.py
+#   scripts/bounding_box_generator.py
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
+
+catkin_install_python(PROGRAMS 
+	scripts/rosbag_reader.py
+    scripts/file_annotator.py
+    scripts/bounding_box_generator.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+	)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
