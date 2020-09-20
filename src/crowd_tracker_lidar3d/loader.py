@@ -2,6 +2,8 @@ import os
 import csv
 import numpy as np
 import pandas as pd
+import open3d as o3d 
+
 
 def load_data(filename, directory): 
     """
@@ -39,3 +41,17 @@ def load_data_to_dataframe(filename, directory):
     # drop rows containing nans 
     data = data.dropna(axis=0, how='any')
     return(data)
+
+def load_pcd_file(filename, path=None): 
+    """
+    Loads pcd files to numpy array with xyz values. 
+    """
+    if path == None: # take LCAS pcd files as default  
+        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/LCAS/LCAS_20160523_1200_1218_pcd/")
+        pc = os.path.join(data_path, filename)
+    else: # filename includes path 
+        pc = filename 
+
+    pcd = o3d.io.read_point_cloud(pc)
+    pcd_array = np.asarray(pcd.points)
+    return(pcd_array)

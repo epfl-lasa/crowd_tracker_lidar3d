@@ -16,7 +16,10 @@ def plot_pointcloud3d(data, point_size=None):
     if isinstance(data, pd.DataFrame):
         ax.scatter(data['x'], data['y'], data['z'], c=data['intensity'], s=point_size*5, edgecolor='', marker='o')
     else: 
-        ax.scatter(data[:,0], data[:,1], data[:,2], c=data[:,3], s=point_size*5, edgecolor='', marker='o')
+        if data.shape[1] == 4:
+            ax.scatter(data[:,0], data[:,1], data[:,2], c=data[:,3], s=point_size*5, edgecolor='', marker='o')
+        elif data.shape[1] == 3:  # If point cloud is XYZ format 
+            ax.scatter(data[:,0], data[:,1], data[:,2], s=point_size*5, marker='o')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
