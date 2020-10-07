@@ -77,7 +77,7 @@ def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], axes_limits=None, xl
         ax.set_title(title, fontsize=18)
         return im 
 
-def show_projections(raw_data, dimensions, savefig=False, filename=None, point_eliminations=None): 
+def show_projections(raw_data, dimensions=None, savefig=False, filename=None, point_eliminations=None): 
     """
     [summary]
 
@@ -88,16 +88,19 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
                            according to their intensity value
         savefig (bool, default=False)
     """
-    
-    data = raw_data[dimensions]
+    if dimensions is not None: 
+        data = raw_data[dimensions]
+    else: 
+        data = pd.DataFrame(raw_data, columns=['x', 'y', 'z', 'intensity'])
+
     if point_eliminations is not None:
         point_eliminations = point_eliminations[dimensions]
     fig, ax3 = plt.subplots(1, 3, figsize=(20, 10)) # plots in 3 columns
     # f, ax3 = plt.subplots(3, 1, figsize=(12, 25)) if plots in 1 column 
 
-    x_max, x_min = np.max(raw_data.x), np.min(raw_data.x)
-    y_max, y_min = np.max(raw_data.y), np.min(raw_data.y)
-    z_max, z_min = np.max(raw_data.z), np.min(raw_data.z)
+    x_max, x_min = np.max(data.x), np.min(data.x)
+    y_max, y_min = np.max(data.y), np.min(data.y)
+    z_max, z_min = np.max(data.z), np.min(data.z)
 
     if point_eliminations is not None: 
         x_max, x_min = np.max(list(data.x) +  list(point_eliminations.x)), np.min(list(data.x) + list(point_eliminations.x))
@@ -134,7 +137,7 @@ def show_projections(raw_data, dimensions, savefig=False, filename=None, point_e
             axes_limits=[axes_limits[1], axes_limits[2]],
             point_eliminations=point_eliminations
         )
-    if len(dimensions) == 4: 
+    if data.shape[1] == 4: 
         fig.colorbar(ax3[2].collections[0], ax=ax3[2])
 
     fig.suptitle('Projections of LiDAR pointcloud data', fontsize=18)

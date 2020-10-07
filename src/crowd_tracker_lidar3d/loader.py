@@ -54,4 +54,5 @@ def load_pcd_file(filename, path=None):
 
     pcd = o3d.io.read_point_cloud(pc)
     pcd_array = np.asarray(pcd.points)
+    print(np.asarray(pcd.colors))
     return(pcd_array)

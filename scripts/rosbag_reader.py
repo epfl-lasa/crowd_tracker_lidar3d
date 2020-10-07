@@ -157,13 +157,13 @@ class RosbagReader():
         """
         Read and save the initial topic list from bag
         """
-        print "[OK] Reading topics in this bag. Can take a while.."
+        print("[OK] Reading topics in this bag. Can take a while..")
         topicList = []
         bag_info = yaml.load(self.bag._get_yaml_info())
         for info in bag_info['topics']:
             topicList.append(info['topic'])
 
-        print '{0} topics found'.format(len(topicList))
+        print('{0} topics found'.format(len(topicList)))
         return topicList
 
 

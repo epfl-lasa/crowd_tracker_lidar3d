@@ -29,6 +29,21 @@ def save_h5(h5_filename, data, label, bbox=None, data_dtype='float32', label_dty
         )       
     h5_fout.close()
     
+def save_h5_basic(h5_filename, data, data_dtype='float32'):
+    h5_fout = h5py.File(h5_filename, 'w')
+    h5_fout.create_dataset(
+            'data', data=data,
+            compression='gzip', compression_opts=4,
+            dtype=data_dtype,
+    )
+    h5_fout.close()
+
+def load_h5_basic(h5_filename):
+    f = h5py.File(h5_filename, 'r')
+    # f.keys() should be [u'data', u'label']
+    data = f['data'][:]
+    return data
+
 
 def load_h5(h5_filename, bbox=False):
     f = h5py.File(h5_filename, 'r')
@@ -47,4 +62,4 @@ def get_data_files(path):
          for file in files:
              if file.endswith('.h5'):
                 data_files.append(file) 
-    return data_fi
+    return data_files

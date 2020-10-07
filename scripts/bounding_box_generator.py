@@ -48,10 +48,6 @@ def main():
             full_file = os.path.join(path, f)
             data, label = load_h5(full_file) 
 
-            # remove floor points from data 
-
-            # ground_mask = np.where(data[:,2] >= 0)
-            # final_data = data[ground_mask]
             final_data = data
             print('Number of points: {}'.format(data.shape[0]))
             # label = label[ground_mask]
@@ -59,6 +55,10 @@ def main():
             # filter data for only positive labels and do bbox calculations only on mask
             mask = np.where(label) 
             filter_data = final_data[mask]
+
+            # remove floor points from data 
+            ground_mask = np.where(filter_data[:,2] >= 0)
+            filter_data = filter_data[ground_mask]
 
             # Check if frame contains human/annotations
             if filter_data.shape[0] == 0: 
