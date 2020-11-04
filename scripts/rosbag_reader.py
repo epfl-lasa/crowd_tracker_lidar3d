@@ -9,16 +9,22 @@ import csv		#writing CV files.
 import yaml
 import numpy as np
 import rosbag
+import cv2
 # import pyrosbag
 import rospy
 import os
 import sys
 import string
 import argparse
-import pcl 
+try: 
+    import pcl 
+except: 
+    ModuleNotFoundError
 
 import sensor_msgs.point_cloud2 as pc2
 from rosbag.bag import Bag
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
 __author__ = "larabrudermueller"
 __date__ = "2020-04-07"
@@ -43,6 +49,21 @@ class RosbagReader():
     def print_bag_info(self):
         info_dict = yaml.load(Bag(input_bag, 'r')._get_yaml_info())
         print(info_dict)
+
+    def extract_camera_data(self):
+        image_topic = '/camera_left/color/image_raw'
+        bag_name = self.bag.filename.strip(".bag").split('/')[-1]
+        output_dir = os.path.join(self.save_dir,bag_name, 'camera')
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        bridge = CvBridge()
+        count = 0
+        for topic, msg, t in self.bag.read_messages(topics=[image_topic]):
+            cv_img = bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+            cv2.imwrite(os.path.join(output_dir, "frame%06i.png" % count), cv_img)
+            print("Wrote image {}".format(count))
+            count += 1
 
     def save_bag_to_pcd(self, topicList=None): 
         if not topicList: 
@@ -217,7 +238,8 @@ if __name__=='__main__':
         # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
         topics = ['/front_lidar/velodyne_points'] 
         # Reader.save_bag_to_csv(topicList=topics)
-        Reader.save_bag_to_pcd(topicList=topics)
+        # Reader.save_bag_to_pcd(topicList=topics)
+        Reader.extract_camera_data()
         # Reader.save_rwth_detections()
     
         Reader.bag.close()
