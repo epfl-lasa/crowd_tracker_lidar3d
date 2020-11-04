@@ -15,6 +15,7 @@ import os
 import sys
 import string
 import argparse
+import pcl 
 
 import sensor_msgs.point_cloud2 as pc2
 from rosbag.bag import Bag
@@ -35,21 +36,36 @@ DATA_DIR = args.datadir
 class RosbagReader(): 
     def __init__(self, bag_dir, input_bag, save_dir):
         self.save_dir =  save_dir
-        os.makedirs(self.save_dir,exist_ok=True)
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
         self.bag = Bag(os.path.join(bag_dir, input_bag))
     
     def print_bag_info(self):
         info_dict = yaml.load(Bag(input_bag, 'r')._get_yaml_info())
         print(info_dict)
-    
-    def save_pointcloud_to_h5(self, topicList=None):
+
+    def save_bag_to_pcd(self, topicList=None): 
         if not topicList: 
             topicList = self.readBagTopicList()
 
         for topic_name in topicList:
             bag_name = self.bag.filename.strip(".bag").split('/')[-1]
-            save_folder = self.save_dir + bag_name 
+            save_temp_dir = os.path.join(self.save_dir,bag_name)
+            if not os.path.exists(save_temp_dir):
+                os.makedirs(save_temp_dir)
+            i = 0 
+            for topic, msg, t in self.bag.read_messages(topic_name):	
+                # for each instance in time that has data for topicName
+                # parse data from this instance
+                save_file = os.path.join(save_temp_dir,'frame_{}_{}.pcd'.format(i,t))
+                i+=1
 
+                if topic == '/front_lidar/velodyne_points':
+                    pc_list = [[p[0], p[1], p[2]] for p in pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z"))]
+                print(np.array(pc_list, dtype=np.float32).shape)
+                p = pcl.PointCloud(np.array(pc_list, dtype=np.float32))
+                print(save_file)
+                p.to_file(save_file)
 
 
     def save_bag_to_csv(self, topicList=None): 
@@ -200,7 +216,8 @@ if __name__=='__main__':
         
         # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
         topics = ['/front_lidar/velodyne_points'] 
-        Reader.save_bag_to_csv(topicList=topics)
+        # Reader.save_bag_to_csv(topicList=topics)
+        Reader.save_bag_to_pcd(topicList=topics)
         # Reader.save_rwth_detections()
     
         Reader.bag.close()
