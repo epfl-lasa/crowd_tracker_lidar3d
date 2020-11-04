@@ -2,7 +2,7 @@
 '''
     Adds approximate minimum 3D bounding box to data labels. Encoded with 6 DOF, 
     i.e. position of box centroid (x,y,z) as well as box dimensions (h,w,l) and 
-    heading angle (ry) measured around y axis.
+    heading angle (rz) measured around z axis.
 '''
 
 import numpy as np

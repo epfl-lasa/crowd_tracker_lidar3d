@@ -9,10 +9,12 @@ import csv		#writing CV files.
 import yaml
 import numpy as np
 import rosbag
+# import pyrosbag
 import rospy
 import os
 import sys
 import string
+import argparse
 
 import sensor_msgs.point_cloud2 as pc2
 from rosbag.bag import Bag
@@ -22,30 +24,43 @@ __date__ = "2020-04-07"
 __email__ = "lara.brudermuller@epfl.ch"
 
 
+parser = argparse.ArgumentParser(description="arg parser")
+parser.add_argument('--datadir', type=str, default='/hdd/data_qolo/med_crowd_06102020/', help='specify the dataset to use')
+parser.add_argument('--input_bag', type=str, default=None, help='specify the rosbag to process')
+args = parser.parse_args()
+
+DATA_DIR = args.datadir
+
+
 class RosbagReader(): 
     def __init__(self, bag_dir, input_bag, save_dir):
         self.save_dir =  save_dir
-        os.chdir(bag_dir)
-        self.bag = rosbag.Bag(input_bag)
+        os.makedirs(self.save_dir,exist_ok=True)
+        self.bag = Bag(os.path.join(bag_dir, input_bag))
     
-    #TODO: change to arguments instead of hardcoding directory 
-    # inputFileName = sys.argv[1]
-    # print "[OK] Found bag: %s" % inputFileName
-
     def print_bag_info(self):
         info_dict = yaml.load(Bag(input_bag, 'r')._get_yaml_info())
         print(info_dict)
     
+    def save_pointcloud_to_h5(self, topicList=None):
+        if not topicList: 
+            topicList = self.readBagTopicList()
+
+        for topic_name in topicList:
+            bag_name = self.bag.filename.strip(".bag").split('/')[-1]
+            save_folder = self.save_dir + bag_name 
+
+
 
     def save_bag_to_csv(self, topicList=None): 
-        os.chdir(self.save_dir)
+        # os.chdir(self.save_dir)
 
         if not topicList: 
             topicList = self.readBagTopicList()
 
         for topic_name in topicList:
-            bag_name = string.rstrip(self.bag.filename, ".bag")
-            filename = self.save_dir + bag_name + string.replace(topic_name, '/', '-') + '.csv'
+            bag_name = self.bag.filename.strip(".bag").split('/')[-1]
+            filename = self.save_dir + bag_name + topic_name.replace('/', '-') + '.csv'
             
             # create csv file for topic data 
             with open(filename, 'w+') as csvfile:
@@ -86,7 +101,6 @@ class RosbagReader():
                             row = [t]
 
         print("Parsed data. Saved as {}".format(filename))
-
 
     def save_rwth_detections(self): 
         """
@@ -159,7 +173,7 @@ class RosbagReader():
         """
         print("[OK] Reading topics in this bag. Can take a while..")
         topicList = []
-        bag_info = yaml.load(self.bag._get_yaml_info())
+        bag_info = yaml.load(self.bag._get_yaml_info(), Loader=yaml.FullLoader)
         for info in bag_info['topics']:
             topicList.append(info['topic'])
 
@@ -168,26 +182,25 @@ class RosbagReader():
 
 
 if __name__=='__main__':
-    # bag_dir = os.path.dirname(os.path.abspath(__file__))
-    # bag_dir = os.path.join(bag_dir, "../data")
-    # save_dir = bag_dir
-    # input_bag = "3m_1person_labeled.bag"
-    save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med/")
-    bag_dir = "/home/brudermueller/Documents/med_recordings"
-    # input_bag = 'lidar1210_person175_4.bag'
-    
-    bag_files_list = [file_name for _,_,file_name in os.walk(bag_dir)].pop()
+    save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med_new/")
+    bag_dir = DATA_DIR
+
+    if args.input_bag: 
+        bag_files_list = [args.input_bag]
+    else: 
+        bag_files_list = [file_name for _,_,file_name in os.walk(bag_dir)].pop()
 
     for input_bag in bag_files_list: 
         print(input_bag)
         Reader = RosbagReader(bag_dir, input_bag, save_dir)
         topicList = Reader.readBagTopicList()
+        print('-------- Topics -------- ')
         for topic in topicList: 
-            print topic     
+            print(topic)
+        
         # topics = ['/camera_front/depth/color/points', '/front_lidar/velodyne_points']
-    
-        # topics = ['/front_lidar/velodyne_points'] 
-        # Reader.save_bag_to_csv(topicList=topics)
+        topics = ['/front_lidar/velodyne_points'] 
+        Reader.save_bag_to_csv(topicList=topics)
         # Reader.save_rwth_detections()
     
         Reader.bag.close()
