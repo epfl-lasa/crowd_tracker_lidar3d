@@ -6,6 +6,12 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot_pointcloud3d(data, point_size=None): 
+    """ Generate a matplotlib 3D plot of the given point cloud data. 
+
+    Args:
+        data (pandas DataFrame or numpy  ndarray): columns of df should contain at least contain 'x', 'y', 'z' 
+        point_size (float): Parameter to adjust the size of each plotted point. Defaults to None.
+    """
     if not point_size: 
         no_points = data.shape[0]
         point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
@@ -29,57 +35,70 @@ def plot_pointcloud3d(data, point_size=None):
     plt.show()
     
 def draw_point_cloud(data, ax, title, axes=['x', 'y', 'z'], axes_limits=None, xlim3d=None, ylim3d=None, zlim3d=None, point_eliminations=None):
-        no_points = data.shape[0]
-        point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
-        
-        if data.shape[1] == 4: # If point cloud is XYZI format (I = intensity)
-            im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c=data['intensity'], cmap='viridis')
-            if point_eliminations is not None: 
-                ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+    """ Plot given point cloud either as a projection in 2D or as 3D plot. 
 
-        elif data.shape[1] == 3:   # If point cloud is XYZ format 
-            im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c='b', alpha = 0.3)
-            if point_eliminations is not None: 
-                ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+    Args:
+        data (pandas DataFrame): columns of df should contain at least contain 'x', 'y', 'z'
+        ax ([matplotlib axis]): the axis to plot on 
+        title (str): title of the plot/figure
+        axes (list, optional): The axes to project the data on. Defaults to ['x', 'y', 'z'].
+        axes_limits (list, optional): Defines limits for each axis. Defaults to None.
+        point_eliminations (pandas DataFrame, optional): Points to color in red, because they have been classified as outliers. Defaults to None.
 
-        ax.set_xlabel('{} axis'.format(axes[0]), fontsize=16)
-        ax.set_ylabel('{} axis'.format(axes[1]), fontsize=16)
+    Returns:
+        [type]: [description]
+    """
+    no_points = data.shape[0]
+    point_size = 10**(3- int(np.log10(no_points))) # Adjust point size based on point cloud size
+    
+    if data.shape[1] == 4: # If point cloud is XYZI format (I = intensity)
+        im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c=data['intensity'], cmap='viridis')
+        if point_eliminations is not None: 
+            ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+
+    elif data.shape[1] == 3:   # If point cloud is XYZ format 
+        im = ax.scatter(*np.transpose(data[axes].to_numpy()), s = point_size, c='b', alpha = 0.3)
+        if point_eliminations is not None: 
+            ax.scatter(*np.transpose(point_eliminations[axes].to_numpy()), s = point_size, c='r', alpha = 0.7)
+
+    ax.set_xlabel('{} axis'.format(axes[0]), fontsize=16)
+    ax.set_ylabel('{} axis'.format(axes[1]), fontsize=16)
+    
+    if not axes_limits:
+        x_max, x_min = np.max(data.x), np.min(data.x)
+        y_max, y_min = np.max(data.y), np.min(data.y)
+        z_max, z_min = np.max(data.z), np.min(data.z)
         
-        if not axes_limits:
-            x_max, x_min = np.max(data.x), np.min(data.x)
-            y_max, y_min = np.max(data.y), np.min(data.y)
-            z_max, z_min = np.max(data.z), np.min(data.z)
-            
-            axes_limits = [
-                [x_min, x_max], # X axis range
-                [y_min, y_max], # Y axis range
-                [z_min, z_max]   # Z axis range
-            ]
+        axes_limits = [
+            [x_min, x_max], # X axis range
+            [y_min, y_max], # Y axis range
+            [z_min, z_max]   # Z axis range
+        ]
+    
+    if len(axes) > 2: # 3-D plot
+        ax.set_xlim3d(axes_limits[0])
+        ax.set_ylim3d(axes_limits[1])
+        ax.set_zlim3d(axes_limits[2])
+        ax.set_zlabel('{} axis'.format(axes[2]), fontsize=16)
         
-        if len(axes) > 2: # 3-D plot
-            ax.set_xlim3d(axes_limits[0])
-            ax.set_ylim3d(axes_limits[1])
-            ax.set_zlim3d(axes_limits[2])
-            ax.set_zlabel('{} axis'.format(axes[2]), fontsize=16)
-            
-        else: # 2-D plot
-            ax.set_xlim(*axes_limits[0])
-            ax.set_ylim(*axes_limits[1])
-        
-        # User specified limits
-        if xlim3d!=None:
-            ax.set_xlim3d(xlim3d)
-        if ylim3d!=None:
-            ax.set_ylim3d(ylim3d)
-        if zlim3d!=None:
-            ax.set_zlim3d(zlim3d)
-        
-        ax.set_title(title, fontsize=18)
-        return im 
+    else: # 2-D plot
+        ax.set_xlim(*axes_limits[0])
+        ax.set_ylim(*axes_limits[1])
+    
+    # User specified limits
+    if xlim3d!=None:
+        ax.set_xlim3d(xlim3d)
+    if ylim3d!=None:
+        ax.set_ylim3d(ylim3d)
+    if zlim3d!=None:
+        ax.set_zlim3d(zlim3d)
+    
+    ax.set_title(title, fontsize=18)
+    return im 
 
 def show_projections(raw_data, dimensions=None, savefig=False, filename=None, point_eliminations=None): 
     """
-    [summary]
+    Creates 3 plots of 3 different projections of the given point cloud, i.e. xy-/yz-/ and xz-pojection. 
 
     Args:
         raw_data (pandas DataFrame): the raw data loaded from rosbags to a dataframe

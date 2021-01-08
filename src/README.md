@@ -1,1 +1,1 @@
-Folder for *cpp source code.
+Source code for logic in annotation and visualization of point clouds. 
