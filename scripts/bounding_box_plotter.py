@@ -15,7 +15,7 @@ from crowd_tracker_lidar3d.hdf5_util import save_h5, load_h5
 from crowd_tracker_lidar3d.annotation_utils import calc_heading_angle
 
 '''
-Visual validation of boudning box annotations for each frame via several plotting functions.
+Visual validation of bounding box annotations for each frame via several plotting functions.
 '''
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/med/annotated_boundbox/")
