@@ -35,8 +35,7 @@ def load_data_to_dataframe(filename, directory):
         filename (string)
         directory (string): path to directory containing correspodning csv file
     """
-    os.chdir(directory)
-    input_file = filename + '.csv'
+    input_file = os.path.join(directory, filename)
     data = pd.read_csv(input_file)
     # drop rows containing nans 
     data = data.dropna(axis=0, how='any')
